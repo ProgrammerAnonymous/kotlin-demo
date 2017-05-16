@@ -1,13 +1,13 @@
 ## 太過簡單的介紹
 
-[Kotlin](https://kotlinlang.org/) 雖然很多人說它是 Java 界的 [Swift](https://swift.org/)，而 JetBrains 團隊其實也將它大舉用在 Android 開發上。但我想，Kotlin 就是 Kotlin，就像在 JVM scripting language 裡，Groovy、Scala、Kotlin、Clojure、Ceylon 各有其特殊地位，我們無法說 Scala 與 Clojure 是 functional language，就說這兩個一樣。但若你要這麼說，那倒也不是不行啦。我們直接看 Kotlin 官方的定義：
+[Kotlin](https://kotlinlang.org/) 雖然很多人說它是 Java 界的 [Swift](https://swift.org/)，而 JetBrains 團隊其實也將它大舉用在 Android 開發上。但我想，Kotlin 就是 Kotlin，就像在 JVM scripting language 裡，Groovy、Scala、Kotlin、Clojure、Ceylon 各有其特殊地位，我們無法說 Scala 與 Clojure 是 functional language，就說這兩個一樣。類比有時能讓我們容易理解與學習事物，但往往也會讓我們迷失了各自的本質。但若你要這麼說，那倒也不是不行啦。我們直接看 Kotlin 官方的定義：
 
 > Statically typed programming language for the JVM, Android and the browser
 > - [Kotlin lang](https://kotlinlang.org/)
 
 ## 必先利其器
 
-會開始研究 Kotlin 不是因為我想開發 Andriod，而是我是 [JetBrains Intellij IDEA](https://www.jetbrains.com/idea/) 的使用者。因此對於那個常常從眼前掠過的新語言，有些許好奇之心，而因此開啟 Kotlin 的開發之路。也因為這個緣故，Kotlin 的開發，首選的工具，便是 Intellij 了。然而，它仍有支援 [Eclipse](http://www.eclipse.org/) 的[Plugin](https://kotlinlang.org/docs/tutorials/getting-started-eclipse.html)。
+會開始研究 Kotlin 不是因為我想開發 Andriod，而是我是 [JetBrains Intellij IDEA](https://www.jetbrains.com/idea/) 的使用者。因此對於那個常常從眼前掠過的新語言，有些許好奇之心，而因此開啟 Kotlin 的開發之路。也因為這個緣故，Kotlin 的開發首選的工具，便是 Intellij 了。然而，它仍有支援 [Eclipse](http://www.eclipse.org/) 的[Plugin](https://kotlinlang.org/docs/tutorials/getting-started-eclipse.html)。
 
 ## 專案結構
 
@@ -99,7 +99,7 @@ fun main(args: Array<String>) {
 
 在 command line 下執行：```gradle clean build```，我們會發現它已經可以正確建置：
 
-```
+```console
 Starting a Gradle Daemon (subsequent builds will be faster)
 :clean
 :compileKotlin
@@ -126,7 +126,7 @@ Total time: 30.376 secs
 
 但它怎麼執行呢？我們在 gradle 的 build/libs 下，會發現一個 jar 檔：
 
-```
+```console
 ➜  libs git:(kotlin-basic) ✗ pwd
 /home/gemhuang/Public/kotlin-demo/kotlin-basic/build/libs
 ➜  libs git:(kotlin-basic) ✗ ll
@@ -136,9 +136,18 @@ total 4.0K
 
 如果直接執行這個 jar 檔呢？
 
-```
-➜  libs git:(kotlin-basic) ✗ java -jar kotlin-basic-1.0-SNAPSHOT.jar 
+```console
+➜  libs git:(kotlin-basic) ✗ java -jar kotlin-basic-1.0-SNAPSHOT.jar
 no main manifest attribute, in kotlin-basic-1.0-SNAPSHOT.jar
 ```
 
 它會跟你說沒有 main！好吧，那我們怎麼辦？
+
+因為 jar 是一種 zip 的格式，我們把它解壓縮來看看：
+
+```console
+unzip kotlin-basic-1.0-SNAPSHOT.jar -d kotlin-basic
+```
+
+```console
+```
