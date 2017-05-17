@@ -150,4 +150,78 @@ unzip kotlin-basic-1.0-SNAPSHOT.jar -d kotlin-basic
 ```
 
 ```console
+➜  libs git:(kotlin-basic) cd kotlin-basic
+➜  kotlin-basic git:(kotlin-basic) ls
+MainKt.class  META-INF
 ```
+
+在這個 jar 檔裡，我們可以找到一個 MainKt 的 class 檔，這代表什麼呢？因為 Kotlin 是 JVM 的一支 scripting language，因此它仍需要按照 JVM 的規範：以 class 為程式的單位。再回到之前寫的那個沒有寫 ```public class``` 的程式，當 Kotlin 碰到這種沒有寫 class 的程式，便自動地幫它建立一個 class 名稱－MainKt。換句話說，MainKt 是否是我們的 main 呢？我們來執行看看：
+
+```console
+➜  kotlin-basic git:(kotlin-basic) cd ..
+➜  libs git:(kotlin-basic) ✗ ls
+kotlin-basic  kotlin-basic-1.0-SNAPSHOT.jar
+➜  libs git:(kotlin-basic) ✗ java -cp .:kotlin-basic-1.0-SNAPSHOT.jar MainKt
+Exception in thread "main" java.lang.NoClassDefFoundError: kotlin/jvm/internal/Intrinsics
+	at MainKt.main(Main.kt)
+Caused by: java.lang.ClassNotFoundException: kotlin.jvm.internal.Intrinsics
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:381)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:331)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 1 more
+```
+
+執行時雖然沒有再爆出找不到 main 的訊息，證實了我們剛剛的猜測，但又發生了一個奇怪的意外：它找不到 ```kotlin.jvm.internal.Intrinsics``` 這個 class！我們從剛剛解開的 jar 檔裡，沒有看到其他的 class 或 jar 檔，那這個 class 在哪裡呢？
+
+> 有沒有人 google 一下？
+
+我們要回頭看 Gradle 的設定檔，然後加入把 compile 相依打包進這個 jar 檔的設定：
+
+```groovy
+jar {
+  from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+```
+
+然後執行同樣的步驟試試：
+
+```console
+➜  kotlin-basic git:(kotlin-basic) ✗ cd build/libs
+➜  libs git:(kotlin-basic) ✗ java -cp .:kotlin-basic-1.0-SNAPSHOT.jar MainKt
+Hello World!
+```
+
+實際執行如下圖：
+
+![Kotlin 5](imgs/kotlin-5.png)
+
+順手把 MainKt 也加入 Gradle 的 jar 設定中：
+
+```groovy
+jar {
+  manifest {
+      attributes "Main-Class": "MainKt"
+  }
+  from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+```
+
+再執行一次：
+
+```console
+➜  kotlin-basic git:(kotlin-basic) ✗ gradle clean build
+➜  kotlin-basic git:(kotlin-basic) ✗ cd build/libs
+➜  libs git:(kotlin-basic) ✗ java -jar kotlin-basic-1.0-SNAPSHOT.jar
+Hello World!
+```
+
+如圖：
+
+![Kotlin 6](imgs/kotlin-6.png)
+
+好了，我們已經建立了一個基本的執行模式與基礎架構，好讓我們可以開發最基本的 Kotlin 程式。
+
+但，你或許不覺得怪怪的，但我覺得挺怪的：當代的軟體工法皆奠基於測試之上，Kotlin 的開發難道可以免除嗎？Kotlin 的開發怎麼做測試呢？
+
+## Kotlin Test
