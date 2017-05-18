@@ -225,3 +225,66 @@ Hello World!
 但，你或許不覺得怪怪的，但我覺得挺怪的：當代的軟體工法皆奠基於測試之上，Kotlin 的開發難道可以免除嗎？Kotlin 的開發怎麼做測試呢？
 
 ## Kotlin Test
+
+因為 Kotlin 是基於 JVM 的 scripting language，所以通常做測試，還是會從 jUnit 入手：
+
+```groovy
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+
+    testCompile "junit:junit:4.12"
+}
+```
+
+我們在 ```src/test/kotlin``` 下，寫一個 main 的測試：
+
+**MainTest.kt**
+
+```kotlin
+class MainTest{
+    @Test
+    fun testMain(){
+        main(emptyArray())
+    }
+}
+```
+
+這樣，我們就建立了一個基本的測試了。裡面的關鍵字與函式，我們稍後就會進行說明。
+
+## 相依性
+
+到現在，我們已經可以建立一個簡單的 kotlin 程式，並且撰寫它的單元測試，但若要更深入地了解系統的結構，我們仍然有必要把它的相依性拆解出來認識一下：
+
+```console
+compileClasspath - Compile classpath for source set 'main'.
+\--- org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.2-2
+     \--- org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.2-2
+          \--- org.jetbrains.kotlin:kotlin-stdlib:1.1.2-2
+               \--- org.jetbrains:annotations:13.0
+
+...
+
+testCompileClasspath - Compile classpath for source set 'test'.
++--- org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.2-2
+|    \--- org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.2-2
+|         \--- org.jetbrains.kotlin:kotlin-stdlib:1.1.2-2
+|              \--- org.jetbrains:annotations:13.0
+\--- junit:junit:4.12
+     \--- org.hamcrest:hamcrest-core:1.3
+```
+
+透過執行 ```gradle dependencies``` 這指令，我們可以找到這個專案各個階段的相依套件。在主要開發編譯相依的套件裡，我們看到幾個 kotlin 核心的套件：
+
+* kotlin-stdlib-jre8
+* kotlin-stdlib-jre7
+* kotlin-stdlib
+* annotations
+
+這些套件便是提供開發者得以撰寫 Kotlin 的程式的最小相依套件。測試方面，則多了以下兩項：
+
+* junit
+* hamcrest-core
+
+除了 Kotlin 相關的套件外，其他我想對於有經驗的 Java 開發者而言都是很熟悉的，因此我們可以準備進入正式開發階段。
+
+## 一個簡單的排序需求
