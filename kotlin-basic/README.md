@@ -287,4 +287,87 @@ testCompileClasspath - Compile classpath for source set 'test'.
 
 除了 Kotlin 相關的套件外，其他我想對於有經驗的 Java 開發者而言都是很熟悉的，因此我們可以準備進入正式開發階段。
 
-## 一個簡單的排序需求
+## 一個簡單的排序程式
+
+在此，我們不會做太複雜的程式，因為目的不在此。我們只需要把一個充滿著隨機整數的陣列傳給排序程式，然後排成遞增的次序。而在此，就會看到 Kotlin 在呼叫 Java 物件、建立物件、基本程式流程、宣告變數、宣告函式等程式語言中最基礎的用法。
+
+排序的原理，也不做解釋，這個演算法真的挺簡單的。我們從排序程式與它的測試先來吧：
+
+**SortTest.kt**
+
+```kotlin
+const val MAX: Int = 10240  // 註 1
+const val SIZE: Int = 1000
+
+class SortTest {  // 註 2
+
+    @Test  // 註 3
+    fun testBubbleSort() {  // 註 4
+        var instances = prepareInstances()  // 註 5
+
+        instances = bubbleSort(instances)  // 註 6
+
+        verifySortedInstances(instances)
+    }
+
+    private fun prepareInstances(): Array<Int> = Array(SIZE, { Random().nextInt(MAX) })  // 註 7
+
+    private fun verifySortedInstances(instances: Array<Int>) {  // 註 8
+        var less = instances[0]  // 註 9
+
+        for (i in 1..instances.size - 1) {  // 註 10
+            var larger = instances[i]
+
+            Assert.assertTrue(less <= larger)
+
+            less = larger
+        }
+    }
+}
+```
+
+**Sort.kt**
+
+```kotlin
+fun bubbleSort(instances: Array<Int>): Array<Int> {  // 註 11
+    for (i in 0..instances.size - 2) {
+        for (j in i + 1..instances.size - 1) ascend(instances, i, j)
+    }
+
+    return instances
+}
+
+fun ascend(instances: Array<Int>, pre: Int, nxt: Int) {
+    if (instances[pre] > instances[nxt]) {
+        val temp = instances[pre]  // 註 12
+        instances[pre] = instances[nxt]
+        instances[nxt] = temp
+    }
+}
+```
+
+## 簡單說明
+
+程式裡的註解點，就是我們接下來要說明的地方。
+
+### 1. 變數的 2.5 種類型
+
+參：註 1、註 5、註 12
+
+kotlin 變數的宣告基本上分為兩種，可變的與不可變的。按 Kotlin 官方文件所述：
+
+> Assign-once (read-only) local variable & Mutable variable
+> - [Kotlin - Basic Syntax](https://kotlinlang.org/docs/reference/basic-syntax.html)
+
+我們在測試程式的開頭，而且是 class 的外部，宣告了兩個看起來像 Java 裡 ```public static final``` 的東西，然而在 Kotlin 裡面是沒有 static 這個概念的，如同 Kotlin Blog 上的一篇所說到：
+
+> Kotlin is designed so that there’s no such thing as a “static member” in a class. If you have a function in a class, it can only be called on instances of this class. If you need something that is not attached to an instance of any class, you define it in a package, outside any class (we call it package-level functions)
+> - [Kotlin Blog - “Static constants” in Kotlin](https://blog.jetbrains.com/kotlin/2013/06/static-constants-in-kotlin/)
+
+因此在 Kotlin 裡，若要定義常數，必須寫在 class 的定義之外。於是就像 _註 1_ 的寫法一樣，把定義寫在 TestClass 的外頭。這個 ```const``` 指定了一個專屬於常數的特性：編譯時即賦值。而 ```val``` 則是 Kotlin 所說的，這是一個一次性賦值、唯讀、區域性的變數宣告。換句話說，如果你在 method 裡頭，或 class 裡頭，想要非正式地設定一個數字，它不是像 PI = 3.1415926 那樣通用，只是在程式碼區塊中用得到的，賦值了之後就不希望被改動到，那麼可以使用 ```val``` 的定義，如同 _註 12_ 的使用。
+
+但另一個我想是更常用的，就是可變的變數。像 _註 5_ 那樣，這變數設了之後，其值或參考到的物件，是可以變動的。因此，它可以指定給一些會不斷變動的，像 index、count 之類的變數使用。
+
+其實實際在寫 Kotlin 時，我常常會分不清什麼時候用 ```val``` 或什麼時候用 ```var```，但在我的觀念裡，固定的比變動的更好。雖然現代的開發思維都傾向靈活、可變，但其實在寫程式時，固定的、不可變的，還是比可變的更穩定，可讀性也更高。如果你在寫的時候，一開始不是很確定，就全用 ```var``` 試試，然後再把一些不會被重新賦值的數值或物件改為 ```val```，執行沒問題後，回頭再讀讀看程式碼，或許你會明白為何 Kotlin 會這樣設計變數的兩大類型。
+
+### 2. jUnit 測試類別
