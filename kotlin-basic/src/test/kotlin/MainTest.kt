@@ -6,7 +6,7 @@ import org.junit.Test
 
 class MainTest{
     @Test
-    fun testMain(){
+    fun testMain() {
         main(emptyArray())
     }
 }
