@@ -225,3 +225,188 @@ Hello World!
 但，你或許不覺得怪怪的，但我覺得挺怪的：當代的軟體工法皆奠基於測試之上，Kotlin 的開發難道可以免除嗎？Kotlin 的開發怎麼做測試呢？
 
 ## Kotlin Test
+
+因為 Kotlin 是基於 JVM 的 scripting language，所以通常做測試，還是會從 jUnit 入手：
+
+```groovy
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+
+    testCompile "junit:junit:4.12"
+}
+```
+
+我們在 ```src/test/kotlin``` 下，寫一個 main 的測試：
+
+**MainTest.kt**
+
+```kotlin
+class MainTest{
+    @Test
+    fun testMain(){
+        main(emptyArray())
+    }
+}
+```
+
+這樣，我們就建立了一個基本的測試了。裡面的關鍵字與函式，我們稍後就會進行說明。
+
+## 相依性
+
+到現在，我們已經可以建立一個簡單的 kotlin 程式，並且撰寫它的單元測試，但若要更深入地了解系統的結構，我們仍然有必要把它的相依性拆解出來認識一下：
+
+```console
+compileClasspath - Compile classpath for source set 'main'.
+\--- org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.2-2
+     \--- org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.2-2
+          \--- org.jetbrains.kotlin:kotlin-stdlib:1.1.2-2
+               \--- org.jetbrains:annotations:13.0
+
+...
+
+testCompileClasspath - Compile classpath for source set 'test'.
++--- org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.2-2
+|    \--- org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.2-2
+|         \--- org.jetbrains.kotlin:kotlin-stdlib:1.1.2-2
+|              \--- org.jetbrains:annotations:13.0
+\--- junit:junit:4.12
+     \--- org.hamcrest:hamcrest-core:1.3
+```
+
+透過執行 ```gradle dependencies``` 這指令，我們可以找到這個專案各個階段的相依套件。在主要開發編譯相依的套件裡，我們看到幾個 kotlin 核心的套件：
+
+* kotlin-stdlib-jre8
+* kotlin-stdlib-jre7
+* kotlin-stdlib
+* annotations
+
+這些套件便是提供開發者得以撰寫 Kotlin 的程式的最小相依套件。測試方面，則多了以下兩項：
+
+* junit
+* hamcrest-core
+
+除了 Kotlin 相關的套件外，其他我想對於有經驗的 Java 開發者而言都是很熟悉的，因此我們可以準備進入正式開發階段。
+
+## 一個簡單的排序程式
+
+在此，我們不會做太複雜的程式，因為目的不在此。我們只需要把一個充滿著隨機整數的陣列傳給排序程式，然後排成遞增的次序。而在此，就會看到 Kotlin 在呼叫 Java 物件、建立物件、基本程式流程、宣告變數、宣告函式等程式語言中最基礎的用法。
+
+排序的原理，也不做解釋，這個演算法真的挺簡單的。我們從排序程式與它的測試先來吧：
+
+**SortTest.kt**
+
+```kotlin
+const val MAX: Int = 10240  // 註 1
+const val SIZE: Int = 1000
+
+class SortTest {  // 註 2
+
+    @Test  // 註 3
+    fun testBubbleSort() {  // 註 4
+        var instances = prepareInstances()  // 註 5
+
+        instances = bubbleSort(instances)  // 註 6
+
+        verifySortedInstances(instances)
+    }
+
+    private fun prepareInstances(): Array<Int> = Array(SIZE, { Random().nextInt(MAX) })  // 註 7
+
+    private fun verifySortedInstances(instances: Array<Int>) {  // 註 8
+        var less = instances[0]  // 註 9
+
+        for (i in 1..instances.size - 1) {  // 註 10
+            var larger = instances[i]
+
+            Assert.assertTrue(less <= larger)
+
+            less = larger
+        }
+    }
+}
+```
+
+**Sort.kt**
+
+```kotlin
+fun bubbleSort(instances: Array<Int>): Array<Int> {  // 註 11
+    for (i in 0..instances.size - 2) {
+        for (j in i + 1..instances.size - 1) ascend(instances, i, j)
+    }
+
+    return instances
+}
+
+fun ascend(instances: Array<Int>, pre: Int, nxt: Int) {
+    if (instances[pre] > instances[nxt]) {
+        val temp = instances[pre]  // 註 12
+        instances[pre] = instances[nxt]
+        instances[nxt] = temp
+    }
+}
+```
+
+## 簡單說明
+
+程式裡的註解點，就是我們接下來要說明的地方。
+
+### 變數的 2.5 種類型
+
+參：註 1、註 5、註 12
+
+kotlin 變數的宣告基本上分為兩種，可變的與不可變的。按 Kotlin 官方文件所述：
+
+> Assign-once (read-only) local variable & Mutable variable
+> - [Kotlin - Basic Syntax](https://kotlinlang.org/docs/reference/basic-syntax.html)
+
+我們在測試程式的開頭，而且是 class 的外部，宣告了兩個看起來像 Java 裡 ```public static final``` 的東西，然而在 Kotlin 裡面是沒有 static 這個概念的，如同 Kotlin Blog 上的一篇所說到：
+
+> Kotlin is designed so that there’s no such thing as a “static member” in a class. If you have a function in a class, it can only be called on instances of this class. If you need something that is not attached to an instance of any class, you define it in a package, outside any class (we call it package-level functions)
+> - [Kotlin Blog - “Static constants” in Kotlin](https://blog.jetbrains.com/kotlin/2013/06/static-constants-in-kotlin/)
+
+因此在 Kotlin 裡，若要定義常數，必須寫在 class 的定義之外。於是就像 _註 1_ 的寫法一樣，把定義寫在 TestClass 的外頭。這個 ```const``` 指定了一個專屬於常數的特性：編譯時即賦值。而 ```val``` 則是 Kotlin 所說的，這是一個一次性賦值、唯讀、區域性的變數宣告。換句話說，如果你在 method 裡頭，或 class 裡頭，想要非正式地設定一個數字，它不是像 PI = 3.1415926 那樣通用，只是在程式碼區塊中用得到的，賦值了之後就不希望被改動到，那麼可以使用 ```val``` 的定義，如同 _註 12_ 的使用。
+
+但另一個我想是更常用的，就是可變的變數。像 _註 5_ 那樣，這變數設了之後，其值或參考到的物件，是可以變動的。因此，它可以指定給一些會不斷變動的，像 index、count 之類的變數使用。
+
+其實實際在寫 Kotlin 時，我常常會分不清什麼時候用 ```val``` 或什麼時候用 ```var```，但在我的觀念裡，固定的比變動的更好。雖然現代的開發思維都傾向靈活、可變，但其實在寫程式時，固定的、不可變的，還是比可變的更穩定，可讀性也更高。如果你在寫的時候，一開始不是很確定，就全用 ```var``` 試試，然後再把一些不會被重新賦值的數值或物件改為 ```val```，執行沒問題後，回頭再讀讀看程式碼，或許你會明白為何 Kotlin 會這樣設計變數的兩大類型。
+
+### 從 jUnit 看 Kotlin 的類別
+
+參：註 2
+
+Kotlin 的類別有數種不同的變異，而這些會在後續的內容中說明。但我在寫 jUnit 時，心裡有一個很大的問題。各位看到的這些測試程式，其實是 try-error 之後寫出來的，一開始是沒有外部的 class 區塊定義的，例如像一開始的測試，原本是這樣寫著的：
+
+**MainTest.kt (original)**
+
+```kotlin
+@Test
+fun testMain() {
+    main(emptyArray())
+}
+```
+
+這樣寫了之後，我發現 jUnit 的執行程式並不領情，而且在 Gradle 建置階段就會出現錯誤。後來便找了找網路上的範例，幫它加上了個 class 定義，成為後來的樣子，才真的過了關。這點讓人很好奇，為何 jUnit 的程式，必須包在一個「具名」的類別中執行呢？我說具名，是因為各位還記得，我們在最初試著執行 main 函式時，曾把 jar 檔解壓縮來看過，裡頭有一個 ```MainKt.class``` 嗎？這其實是在 Kotlin 中，為沒有宣告 class 的程式所給定的預設類別名稱，在程式的語義裡，可說是一種「不具名」的類別：它雖然不特意宣告 class，但也不刻意匿名。然而，main 可以放在這樣的預設命名，甚至是不刻意命名的類別中，但 jUnit 的測試函式呢？雖然我沒有找到最根本的說明，但從許多人的寫作範例來看，jUnit 的測試函式，必須放在一個「具名」且「刻意」命名的類別中。換句話說，你可以為它取各種名字，不與檔名相同也可以，但一定要命名。
+
+Kotlin 裡的類別，像它的各個兄弟與父執輩語言一樣，用 ```class``` 關鍵字定義，並用 ```{}``` 包裹住它的內容。關於類別的更深一層應用，我們會在後續內容中說明。
+
+### Annotations
+
+參：註 3
+
+Annotation 是 Java 語言的一個特性，它在其他的語言平台上，也有各自的稱呼，或叫 decorator，或叫 attribute；它們不管稱呼什麼，皆是用來定義程式的附註資訊，或可以說是 metadata。Kotlin 在這一個使用方式上，沒有做太大的改變，一樣是使用 ```@``` 符號作為 annotation 的開頭。Annotation 的定義屬於較深的議題，就不再這裡討論。
+
+### Kotlin 的類型定義
+
+參：註 1、註 7、註 8、註 11
+
+Kotlin 的類型定義，如同它的文件所說的：
+
+>
+
+### Kotlin 的 method 與 function
+
+參：註 4、註 7、註 8、註 11
+
+先定義一下我所使用的這兩個字的差異，method 是指定義在 object、class 裡面，作為物件行為的 function，而 function 除了指廣義的函數（或函式）等，更是指單獨執行的函數，或函數式編程裡的函數。為免語意模糊，我會盡量用英文名詞。
+
+Kotlin 是一個可以做 functional programming 的語言，雖然不像 scala 或 clojure 那麼徹底。而 Kotlin 的 function 定義，很簡單地打一個 ```fun``` 即可，如「註 4」所示。
