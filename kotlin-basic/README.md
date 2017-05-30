@@ -395,18 +395,60 @@ Kotlin 裡的類別，像它的各個兄弟與父執輩語言一樣，用 ```cla
 
 Annotation 是 Java 語言的一個特性，它在其他的語言平台上，也有各自的稱呼，或叫 decorator，或叫 attribute；它們不管稱呼什麼，皆是用來定義程式的附註資訊，或可以說是 metadata。Kotlin 在這一個使用方式上，沒有做太大的改變，一樣是使用 ```@``` 符號作為 annotation 的開頭。Annotation 的定義屬於較深的議題，就不再這裡討論。
 
-### Kotlin 的類型定義
+### Kotlin 的型別宣告
 
 參：註 1、註 7、註 8、註 11
 
-Kotlin 的類型定義，如同它的文件所說的：
+Kotlin 的型別宣告方式，很像 Pascal 或 Basic，它們皆把變數或 function 名稱放前面，類型放後面，Pascal 中間使用冒號分開，Basic 則多了個冗長的關鍵字。如同註 1 所示:
 
->
+修飾子(範圍/類型) | 名稱 | 型別 | 賦值
+ ---- | ---- | ---- | ----
+```const val``` | ```MAX``` | **:** ```Int``` | **=** ```10240```
+
+這樣的寫法，在 function/method 的宣告也是一樣，如同註 11 所示：
+
+修飾子(範圍/類型) | 名稱 | 型別
+ ---- | ---- | ----
+```fun``` | ```bubbleSort``` (參數略) | **:** ```Array<Int>```
+
 
 ### Kotlin 的 method 與 function
 
 參：註 4、註 7、註 8、註 11
 
-先定義一下我所使用的這兩個字的差異，method 是指定義在 object、class 裡面，作為物件行為的 function，而 function 除了指廣義的函數（或函式）等，更是指單獨執行的函數，或函數式編程裡的函數。為免語意模糊，我會盡量用英文名詞。
+先定義一下我所使用的這兩個字的差異，function 指的是在程式語言裡面的一個小型區塊，裡頭寫了特定用途的一組程式，而 method 是指定義在 object、class 裡面，作為表示物件行為的 function，而 function 也用來代表 functional programming 裡的 function。為免語意模糊，我會盡量用英文名詞。
 
-Kotlin 是一個可以做 functional programming 的語言，雖然不像 scala 或 clojure 那麼徹底。而 Kotlin 的 function 定義，很簡單地打一個 ```fun``` 即可，如「註 4」所示。
+而 Kotlin 的 function 定義，很簡單地打一個 ```fun``` 即可，如「註 4」所示：
+
+```kotlin
+fun testBubbleSort() {
+}
+```
+
+這個 function 沒有回傳值嗎？在 Java 沒有回傳值的 function 要定義為 ```void```，而在 Kotlin 裡沒有回傳值的 function 也一樣要定義為 ```Unit```，但卻可省略。
+
+Kotlin 是一種可以實現 functional programming 概念的程式語言，雖然註 7 的寫法是一種簡單的回傳簡寫方式，但它也反映了這個語言處理 function 的思維：
+
+```kotlin
+private fun prepareInstances(): Array<Int> = Array(SIZE, { Random().nextInt(MAX) })
+
+// 可寫成:
+
+private fun prepareInstances(): Array<Int>{
+    return Array(SIZE, { Random().nextInt(MAX) })
+}
+```
+
+### Kotlin 的類別與物件
+
+參：註 2、註 7
+
+Kotlin 本身是個混合了物件導向與函數式的程式語言，它比 JavaScript 嚴謹，但比 Java 更靈活。它有相當完整，但輕量的類別定義方式，我們在這裡，只會看到最基本的寫法。
+
+如同註 2 與 **MainTest.kt** 所示，在 jUnit 裡面必須以一個具名類別包住測試 function，因此我們不得不在此加上一個類別的宣告：
+
+```kotlin
+class SortTest {
+}
+```
+
