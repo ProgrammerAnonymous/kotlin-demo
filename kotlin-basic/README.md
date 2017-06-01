@@ -395,13 +395,11 @@ Kotlin 裡的類別，像它的各個兄弟與父執輩語言一樣，用 ```cla
 
 Annotation 是 Java 語言的一個特性，它在其他的語言平台上，也有各自的稱呼，或叫 decorator，或叫 attribute；它們不管稱呼什麼，皆是用來定義程式的附註資訊，或可以說是 metadata。Kotlin 在這一個使用方式上，沒有做太大的改變，一樣是使用 ```@``` 符號作為 annotation 的開頭。Annotation 的定義屬於較深的議題，就不再這裡討論。
 
-### Kotlin 的類型定義
+### Kotlin 的型別宣告
 
 參：註 1、註 7、註 8、註 11
 
-Kotlin 的類型定義，如同它的文件所說的：
-
->
+型別(type)宣告的意思是說，我有一個變數，要給定它一個明確的型別(type)，可以是整數、浮點數、布林值這類原始型別(primitive type)，也可以定義為字串、日期，或任何我自己設計的類別(class)。而我第一次看到 Kotlin 的型別宣告時，感覺有種熟悉感，那是早期在看 Delphi 所用的 Object Pascal 語言的型別宣告語法：變數在前，型別在後。當然，等號就沒借過來，等號的使用還是遵循 Java 的習慣：以一個等號作為賦值(assign)。這樣的宣告方式，可以使用在變數，也使用在函式。如此一來，在閱讀程式碼的時候，就會先看見 **名字**，再看見 **型別**。這是與 Java 的程式結構上，最大的差異點。
 
 ### Kotlin 的 method 與 function
 
@@ -409,4 +407,8 @@ Kotlin 的類型定義，如同它的文件所說的：
 
 先定義一下我所使用的這兩個字的差異，method 是指定義在 object、class 裡面，作為物件行為的 function，而 function 除了指廣義的函數（或函式）等，更是指單獨執行的函數，或函數式編程裡的函數。為免語意模糊，我會盡量用英文名詞。
 
-Kotlin 是一個可以做 functional programming 的語言，雖然不像 scala 或 clojure 那麼徹底。而 Kotlin 的 function 定義，很簡單地打一個 ```fun``` 即可，如「註 4」所示。
+Kotlin 是一個可以做 functional programming 的語言，雖然不像 scala 或 clojure 那麼徹底。而 Kotlin 的 function 定義，很簡單地打一個 ```fun``` 即可，如「註 4」所示。而每個 function 都需要面對的回傳值，Kotlin 不像 Groovy 或 Ruby 那樣，可以由底層去猜測其回傳的內容。因此在寫的時候，要像 Java 一樣，明確說明回傳值，除非今天是不用回傳的函式(```Unit```)。可以參考其文件所說明：
+
+>Explicit return types
+>Functions with block body must always specify return types explicitly, unless it's intended for them to return Unit, in which case it is optional. Kotlin does not infer return types for functions with block bodies because such functions may have complex control flow in the body, and the return type will be non-obvious to the reader (and sometimes even for the compiler).
+> [Kotlin - Functions - Explicit return types](https://kotlinlang.org/docs/reference/functions.html#explicit-return-types)
