@@ -451,12 +451,6 @@ class SortTest {
 }
 ```
 
-Kotlin 是一個可以做 functional programming 的語言，雖然不像 scala 或 clojure 那麼徹底。而 Kotlin 的 function 定義，很簡單地打一個 ```fun``` 即可，如「註 4」所示。而每個 function 都需要面對的回傳值，Kotlin 不像 Groovy 或 Ruby 那樣，可以由底層去猜測其回傳的內容。因此在寫的時候，要像 Java 一樣，明確說明回傳值，除非今天是不用回傳的函式(```Unit```)。可以參考其文件所說明：
-
->Explicit return types
->Functions with block body must always specify return types explicitly, unless it's intended for them to return Unit, in which case it is optional. Kotlin does not infer return types for functions with block bodies because such functions may have complex control flow in the body, and the return type will be non-obvious to the reader (and sometimes even for the compiler).
-> [Kotlin - Functions - Explicit return types](https://kotlinlang.org/docs/reference/functions.html#explicit-return-types)
-
 ### Kotlin 的資料型態
 
 在這個範例中，我們會使用到兩種資料型態，或說一種資料型態，一種資料結構。型態指的是 Int (整數)，結構指的是 Array (陣列)。Kotlin 是一種靜態強型別語言，雖然可以用 var 或 val 來設定變數，但變數型別一旦設定，就無法改變。不信，可以打這一段試試：
