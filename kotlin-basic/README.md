@@ -412,3 +412,17 @@ Kotlin 是一個可以做 functional programming 的語言，雖然不像 scala 
 >Explicit return types
 >Functions with block body must always specify return types explicitly, unless it's intended for them to return Unit, in which case it is optional. Kotlin does not infer return types for functions with block bodies because such functions may have complex control flow in the body, and the return type will be non-obvious to the reader (and sometimes even for the compiler).
 > [Kotlin - Functions - Explicit return types](https://kotlinlang.org/docs/reference/functions.html#explicit-return-types)
+
+### Kotlin 的資料型態
+
+在這個範例中，我們會使用到兩種資料型態，或說一種資料型態，一種資料結構。型態指的是 Int (整數)，結構指的是 Array (陣列)。Kotlin 是一種靜態強型別語言，雖然可以用 var 或 val 來設定變數，但變數型別一旦設定，就無法改變。不信，可以打這一段試試：
+
+```kotlin
+var test = 123
+test = "abc"
+```
+
+這樣是無法通過編譯的，連 IDE 的語法檢查都過不去。一個 Int，可以這樣宣告：```var a: Int = 123```，或簡單地：```var a = 123```；而很多的 Int 組合在一起，這就成了資料結構的概念，這範例使用到一個最基本的資料結構：Array。宣告一個 Int 的陣列，可以這麼寫：```var values: Array<Int> = 
+
+### Kotlin 的 range 與 for-loop
+
