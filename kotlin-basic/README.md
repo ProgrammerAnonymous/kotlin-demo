@@ -455,6 +455,8 @@ Kotlin 的類別定義有許多種，我們現在所見的是最基本的做法�
 
 ### Kotlin 的資料型態
 
+參：註 1、註 7、註 8、註 9、註 11、註 12
+
 在這個範例中，我們會使用到兩種資料型態，或說一種資料型態，一種資料結構。型態指的是 Int (整數)，結構指的是 Array (陣列)。Kotlin 是一種靜態強型別語言，雖然可以用 var 或 val 來設定變數，但變數型別一旦設定，就無法改變。不信，可以打這一段試試：
 
 ```kotlin
@@ -462,7 +464,16 @@ var test = 123
 test = "abc"
 ```
 
-這樣是無法通過編譯的，連 IDE 的語法檢查都過不去。一個 Int，可以這樣宣告：```var a: Int = 123```，或簡單地：```var a = 123```；而很多的 Int 組合在一起，這就成了資料結構的概念，這範例使用到一個最基本的資料結構：Array。宣告一個 Int 的陣列，可以這麼寫：```var values: Array<Int> = arrayOf(1, 2, 3)``` 或 ```var values: Array<Int> = Array(3, {1, 2, 3})```
+這樣是無法通過編譯的，連 IDE 的語法檢查都過不去。一個 Int，可以這樣宣告：```var a: Int = 123```，或簡單地：```var a = 123```；而很多的 Int 組合在一起，這就成了資料結構的概念，這範例使用到一個最基本的資料結構：Array。宣告一個 Int 的陣列，可以這麼寫：```var values: Array<Int> = arrayOf(1, 2, 3)``` 或 ```var values: Array<Int> = Array(3, {1, 2, 3})```。而 Array 的存取，可以用傳統的寫法，如註 9：```var less = instances[0]```，Array 的索引從 ```0``` 開始，到 ```n - 1```。
+
+Kotlin 的 Array 有其他的替代用法，不再此處詳述，我們後續會再介紹。
 
 ### Kotlin 的 range 與 for-loop
 
+參：註 10
+
+Kotlin 的 for-loop 很像 [Swift](http://nilhcem.com/swift-is-like-kotlin/) 或 [Ruby](http://ruby.bastardsbook.com/chapters/loops/)：```for index in range ```。而這幾種語言所使用到的 Range 寫法乍看之下大同小異，但真正的差異點，也是跨語言的人容易困惑的地方，就是 Range 的結束點：Kotlin 只有一種 Range：```..```，而 Range 不會提前一項結束。但 Ruby 有兩種 Range，```..``` 的結束與 ```...``` 的結束是不同的，```...``` 是一種會提前結束的 Range 寫法。這兩種差別在，若是你用在寫 Array index 的 iterating，```..``` 的 Range 會強迫你取出 size 再減 1，而 ```...``` 的 Range 只要把 size 帶進去就好。至於 Swift，也有這樣的用法：```..<```。雖然這說明寫得有點複雜，像繞口令似的，但你只要記得，Kotlin 是基於 Java 的語言，在做 for-loop，使用 index 時，也須按照 Java 的 for-loop 思維，結束在 Array size - 1 的地方：```for(int i = 0; i <= instance.length - 1; i++)```。
+
+## 久違的結尾
+
+至此，Kotlin 的基本語言元素，你已經在一個簡單的小程式裡學到。我們需要再更深一步來思考，我們用這個語言可以做什麼，需要用什麼樣的語言元素來幫助我們達到目的。
